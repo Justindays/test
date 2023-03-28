@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>四六法手沖咖啡計時器</title>
+    <style>
+      /* 計時器樣式 */
+      #timer {
+        font-size: 36px;
+        text-align: left;
+        margin-top: 30px;
+      }
+
+      /* 進度條樣式 */
+      #progressBar {
+        width: 10%;
+        height: 30px;
+        background-color: #ddd;
+        margin-top: 30px;
+      }
+
+      #progress {
+        height: 100%;
+        background-color: #4caf50;
+        width: 0%;
+      }
+
+      /* 按鈕樣式 */
+      button {
+        font-size: 24px;
+        padding: 10px;
+        margin-top: 30px;
+      }
+
+      #startBtn {
+        background-color: #4caf50;
+        color: #fff;
+      }
+
+      #stopBtn {
+        background-color: #f44336;
+        color: #fff;
+      }
+
+      /* 輸入框樣式 */
+      input[type="number"] {
+        font-size: 24px;
+        padding: 1px;
+        margin-top: 1px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>四六法手沖咖啡計時器</h1>
+    <label for="coffeeWeight">咖啡粉量（克）：</label>
+    <input type="number" id="coffeeWeight" value="20" />
+    <label for="interval">間隔時間（秒）：</label>
+    <input type="number" id="interval" value="45" />
+    <div id="timer">00:00</div>
+    <div id="progressBar">
+      <div id="progress"></div>
+    </div>
+    <div>水量：<span id="waterAmount"></span> 克</div>
+    <div>加水次數：<span id="waterCount">1</span> 次</div>
+    <button id="startBtn">開始</button>
+    <button id="stopBtn">停止</button>
+    <script>
+      // 取得元素
+      const coffeeWeightInput = document.getElementById("coffeeWeight");
+      const intervalInput = document.getElementById("interval");
+      const timerDiv = document.getElementById("timer");
+      const progressDiv = document.getElementById("progress");
+      const waterAmountDiv = document.getElementById("waterAmount");
+      const waterCountDiv = document.getElementById("waterCount");
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+
+      let intervalId; // 計時器 ID
+      let startTime; // 開始時間
+      let elapsedTime; // 經過時間
+      let waterAmount; // 水量
+      let waterCount; // 加水次數
+
+      // 設定水量和加水次數的初始值
+      function init() {
+        waterAmount = coffeeWeightInput.value * 3;
+        waterCount = 1;
+        waterAmountDiv.textContent = waterAmount;
+        waterCountDiv.textContent = waterCount;
+      }
+
+      // 更新計時器和進度條
+function update() {
+// 計算經過時間
+elapsedTime = Date.now() - startTime;
+
+    // 計算剩餘時間
+    let remainingTime = intervalInput.value * 1000 - elapsedTime;
+    if (remainingTime < 0) {
+      remainingTime = 0;
+    }
+
+    // 顯示計時器和進度條
+    timerDiv.textContent = formatTime(elapsedTime);
+    progressDiv.style.width =
+      ((intervalInput.value * 1000 - remainingTime) /
+        (intervalInput.value * 1000)) *
+        100 +
+      "%";
+
+    // 每經過一次間隔時間，加水次數+1，水量再加上咖啡粉量的三倍
+    if (elapsedTime >= intervalInput.value * 1000) {
+      waterCount++;
+      waterAmount += coffeeWeightInput.value * 3;
+      waterAmountDiv.textContent = waterAmount;
+      waterCountDiv.textContent = waterCount;
+      startTime = Date.now();
+    }
+  }
+
+  // 格式化時間
+  function formatTime(time) {
+    const date = new Date(time);
+    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    const seconds = date.getUTCSeconds().toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }
+
+  // 開始計時器
+  function startTimer() {
+    init();
+    startTime = Date.now();
+    intervalId = setInterval(update, 10);
+  }
+
+  // 停止計時器
+  function stopTimer() {
+    clearInterval(intervalId);
+  }
+
+  // 綁定按鈕事件
+  startBtn.addEventListener("click", startTimer);
+  stopBtn.addEventListener("click", stopTimer);
+</script>
+  </body>
+</html>
+
